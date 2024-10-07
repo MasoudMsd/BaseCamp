@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ArraysExercise {
+    // متغیرهای حالت برای ذخیره آرایه‌های اعداد، زمان‌نگاشت‌ها و فرستندگان
+    uint[] private numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // آرایه اعداد با مقادیر اولیه
+    uint[] private timestamps; // آرایه دینامیک برای ذخیره زمان‌نگاشت‌ها
+    address[] private senders; // آرایه دینامیک برای ذخیره آدرس‌های فرستنده
+
+    uint256 private constant Y2K = 946702800; // ثابت نمایانگر زمان یونیکس برای سال 2000
+
+    // تابع برای دریافت آرایه اعداد
+    function getNumbers() external view returns (uint[] memory) {
+        return numbers; // برگرداندن آرایه اعداد به طور مستقیم
+    }
+
+    // تابع برای بازنشانی آرایه اعداد به مقادیر اولیه
+    function resetNumbers() public {
+        numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // بازنشانی آرایه به مقادیر اولیه
+    }
+
+    // تابع برای اضافه کردن اعداد جدید به آرایه اعداد
+    function appendToNumbers(uint[] calldata _toAppend) public {
+        // اضافه کردن هر عنصر از آرایه به آرایه numbers
+        for (uint i = 0; i < _toAppend.length; i++) {
+            numbers.push(_toAppend[i]);
+        }
+    }
+
+    // تابع برای ذخیره زمان‌نگاشت به همراه آدرس فرستنده
+    function saveTimestamp(uint _unixTimestamp) public {
+        timestamps.push(_unixTimestamp); // ذخیره زمان‌نگاشت
+        senders.push(msg.sender); // ذخیره آدرس فرستنده
+    }
+
+    // تابع برای دریافت زمان‌نگاشت‌ها و فرستندگان بعد از سال 2000
+    function afterY2K() public view returns (uint256[] memory, address[] memory) {
+        // شمارش زمان‌نگاشت‌ها بعد از سال 2000
+        uint256 count = 0;
+
+        for (uint i = 0; i < timestamps.length; i++) {
+            if (timestamps[i] > Y2K) {
+                count++;
+            }
+        }
+
+        // آرایه‌های حافظه برای زمان‌نگاشت‌ها و فرستندگان بعد از سال 2000
+        uint256[] memory timestampsAfterY2K = new uint256[](count);
+        address[] memory sendersAfterY2K = new address[](count);
+
+        // پر کردن آرایه‌های حافظه با زمان‌نگاشت‌ها و فرستندگان بعد از سال 2000
+        uint256 index = 0;
+        for (uint i = 0; i < timestamps.length; i++) {
+            if (timestamps[i] > Y2K) {
+                timestampsAfterY2K[index] = timestamps[i];
+                sendersAfterY2K[index] = senders[i];
+                index++;
+            }
+        }
+
+        // بازگرداندن زمان‌نگاشت‌ها و فرستندگان بعد از سال 2000
+        return (timestampsAfterY2K, sendersAfterY2K);
+    }
+
+    // تابع برای بازنشانی آرایه فرستندگان
+    function resetSenders() public {
+        delete senders; // حذف تمام عناصر آرایه senders
+    }
+
+    // تابع برای بازنشانی آرایه زمان‌نگاشت‌ها
+    function resetTimestamps() public {
+        delete timestamps; // حذف تمام عناصر آرایه timestamps
+    }
+}

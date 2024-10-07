@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract ControlStructures {
+    // تعریف خطاهای سفارشی برای استفاده در قرارداد
+    error AfterHours(uint256 time);
+    error AtLunch();
+
+    // تابع FizzBuzz برای بررسی عدد ورودی و برگرداندن نتیجه
+    function fizzBuzz(uint256 _number) public pure returns (string memory response) {
+        // بررسی اینکه آیا عدد بر 3 و 5 تقسیم‌پذیر است
+        if (_number % 3 == 0 && _number % 5 == 0) {
+            return "FizzBuzz"; // برگرداندن "FizzBuzz" اگر عدد بر 3 و 5 تقسیم‌پذیر باشد
+        } 
+        // بررسی اینکه آیا عدد بر 3 تقسیم‌پذیر است
+        else if (_number % 3 == 0) {
+            return "Fizz"; // برگرداندن "Fizz" اگر عدد بر 3 تقسیم‌پذیر باشد
+        } 
+        // بررسی اینکه آیا عدد بر 5 تقسیم‌پذیر است
+        else if (_number % 5 == 0) {
+            return "Buzz"; // برگرداندن "Buzz" اگر عدد بر 5 تقسیم‌پذیر باشد
+        } 
+        // اگر هیچ‌کدام از شرایط بالا صحیح نباشند
+        else {
+            return "Splat"; // برگرداندن "Splat" اگر هیچ‌کدام از شرایط صحیح نباشند
+        }
+    }
+
+    // تابع doNotDisturb برای بررسی زمان ورودی و برگرداندن نتیجه
+    function doNotDisturb(uint256 _time) public pure returns (string memory result) {
+        // بررسی اینکه آیا زمان ورودی معتبر است (بزرگتر یا مساوی 2400 نیست)
+        assert(_time < 2400);
+
+        // بررسی محدوده‌های مختلف زمانی و برگرداندن پاسخ مناسب یا اجرای خطاها
+        if (_time > 2200 || _time < 800) {
+            revert AfterHours(_time); // خطای سفارشی اگر زمان بیشتر از 2200 یا کمتر از 800 باشد
+        } 
+        else if (_time >= 1200 && _time <= 1299) {
+            revert AtLunch(); // خطای سفارشی اگر زمان بین 1200 و 1299 باشد (ساعت ناهار)
+        } 
+        else if (_time >= 800 && _time <= 1199) {
+            return "Morning!"; // برگرداندن "Morning!" اگر زمان بین 800 و 1199 باشد
+        } 
+        else if (_time >= 1300 && _time <= 1799) {
+            return "Afternoon!"; // برگرداندن "Afternoon!" اگر زمان بین 1300 و 1799 باشد
+        } 
+        else if (_time >= 1800 && _time <= 2200) {
+            return "Evening!"; // برگرداندن "Evening!" اگر زمان بین 1800 و 2200 باشد
+        }
+    }
+}

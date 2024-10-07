@@ -1,0 +1,91 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+/**
+ * @title FavoriteRecords
+ * @dev قرارداد برای مدیریت لیست رکوردهای موسیقی تأیید شده و اجازه به کاربران برای افزودن آنها به لیست موردعلاقه
+ */
+contract FavoriteRecords {
+    // نگاشت برای ذخیره اینکه آیا یک رکورد تأیید شده است
+    mapping(string => bool) private approvedRecords;
+    // آرایه برای ذخیره شاخص رکوردهای تأیید شده
+    string[] private approvedRecordsIndex;
+
+    // نگاشت برای ذخیره رکوردهای موردعلاقه کاربران
+    mapping(address => mapping(string => bool)) public userFavorites;
+    // نگاشت برای ذخیره شاخص رکوردهای موردعلاقه کاربران
+    mapping(address => string[]) private userFavoritesIndex;
+
+    // خطای سفارشی برای مدیریت رکوردهای تأیید نشده
+    error NotApproved(string albumName);
+
+    /**
+     * @dev سازنده که لیست رکوردهای تأیید شده را inicialize می‌کند
+     */
+    constructor() {
+        // لیست از پیش تعیین‌شده رکوردهای تأیید شده
+        approvedRecordsIndex = [
+            "Thriller", 
+            "Back in Black", 
+            "The Bodyguard", 
+            "The Dark Side of the Moon", 
+            "Their Greatest Hits (1971-1975)", 
+            "Hotel California", 
+            "Come On Over", 
+            "Rumours", 
+            "Saturday Night Fever"
+        ];
+
+        // inicialize کردن نگاشت رکوردهای تأیید شده
+        for (uint i = 0; i < approvedRecordsIndex.length; i++) {
+            approvedRecords[approvedRecordsIndex[i]] = true;
+        }
+    }
+
+    /**
+     * @dev بازگشت لیست رکوردهای تأیید شده
+     * @return آرایه‌ای از نام رکوردهای تأیید شده
+     */
+    function getApprovedRecords() public view returns (string[] memory) {
+        return approvedRecordsIndex; // بازگشت لیست رکوردهای تأیید شده به‌طور مستقیم
+    }
+
+    /**
+     * @dev افزودن یک رکورد تأیید شده به رکوردهای موردعلاقه کاربر
+     * @param _albumName نام آلبوم برای افزودن
+     */
+    function addRecord(string memory _albumName) public {
+        // بررسی اینکه آیا رکورد تأیید شده است
+        if (!approvedRecords[_albumName]) {
+            revert NotApproved(_albumName); // بازگشت با خطای سفارشی
+        }
+
+        // بررسی اینکه آیا رکورد در لیست موردعلاقه کاربر وجود ندارد
+        if (!userFavorites[msg.sender][_albumName]) {
+            // افزودن رکورد به لیست موردعلاقه کاربر و شاخص آن
+            userFavorites[msg.sender][_albumName] = true;
+            userFavoritesIndex[msg.sender].push(_albumName);
+        }
+    }
+
+    /**
+     * @dev بازگشت لیست رکوردهای موردعلاقه کاربر
+     * @param _address آدرس کاربر
+     * @return آرایه‌ای از نام رکوردهای موردعلاقه کاربر
+     */
+    function getUserFavorites(address _address) public view returns (string[] memory) {
+        return userFavoritesIndex[_address]; // بازگشت رکوردهای موردعلاقه کاربر به‌طور مستقیم
+    }
+
+    /**
+     * @dev بازنشانی لیست رکوردهای موردعلاقه تماس‌گیرنده
+     */
+    function resetUserFavorites() public {
+        // تکرار در رکوردهای موردعلاقه کاربر و حذف هر رکورد از نگاشت
+        for (uint i = 0; i < userFavoritesIndex[msg.sender].length; i++) {
+            delete userFavorites[msg.sender][userFavoritesIndex[msg.sender][i]];
+        }
+        // حذف شاخص رکوردهای موردعلاقه کاربر
+        delete userFavoritesIndex[msg.sender];
+    }
+}

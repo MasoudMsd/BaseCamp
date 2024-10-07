@@ -1,0 +1,78 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+/**
+ * @title GarageManager
+ * @dev قرارداد برای مدیریت گاراژ خودروها برای هر کاربر
+ */
+contract GarageManager {
+    // نگاشت برای ذخیره گاراژ خودروها برای هر کاربر
+    mapping(address => Car[]) private garages;
+
+    // ساختار برای نمایندگی یک خودرو
+    struct Car {
+        string make; // برند خودرو
+        string model; // مدل خودرو
+        string color; // رنگ خودرو
+        uint numberOfDoors; // تعداد درهای خودرو
+    }
+
+    // خطای سفارشی برای مدیریت اندیس نامعتبر خودرو
+    error BadCarIndex(uint256 index);
+
+    /**
+     * @dev افزودن یک خودرو جدید به گاراژ تماس‌گیرنده
+     * @param _make برند خودرو
+     * @param _model مدل خودرو
+     * @param _color رنگ خودرو
+     * @param _numberOfDoors تعداد درهای خودرو
+     */
+    function addCar(string memory _make, string memory _model, string memory _color, uint _numberOfDoors) external {
+        // افزودن یک ساختار جدید خودرو با جزئیات ارائه شده به گاراژ تماس‌گیرنده
+        garages[msg.sender].push(Car(_make, _model, _color, _numberOfDoors));
+    }
+
+    /**
+     * @dev بازیابی آرایه خودروهای تماس‌گیرنده
+     * @return آرایه‌ای از ساختارهای Car
+     */
+    function getMyCars() external view returns (Car[] memory) {
+        // بازگشت آرایه خودروهای ذخیره شده در گاراژ تماس‌گیرنده
+        return garages[msg.sender];
+    }
+
+    /**
+     * @dev بازیابی آرایه خودروهای یک کاربر خاص
+     * @param _user آدرس کاربر
+     * @return آرایه‌ای از ساختارهای Car
+     */
+    function getUserCars(address _user) external view returns (Car[] memory) {
+        // بازگشت آرایه خودروهای ذخیره شده در گاراژ کاربر مشخص شده
+        return garages[_user];
+    }
+
+    /**
+     * @dev به‌روزرسانی یک خودرو خاص در گاراژ تماس‌گیرنده
+     * @param _index اندیس خودرو در آرایه گاراژ
+     * @param _make برند جدید خودرو
+     * @param _model مدل جدید خودرو
+     * @param _color رنگ جدید خودرو
+     * @param _numberOfDoors تعداد درهای جدید خودرو
+     */
+    function updateCar(uint256 _index, string memory _make, string memory _model, string memory _color, uint _numberOfDoors) external {
+        // بررسی اینکه آیا اندیس ارائه شده معتبر است
+        if (_index >= garages[msg.sender].length) {
+            revert BadCarIndex({index: _index}); // بازگشت با خطای سفارشی اگر اندیس نامعتبر باشد
+        }
+        // به‌روزرسانی خودرو مشخص شده با جزئیات جدید
+        garages[msg.sender][_index] = Car(_make, _model, _color, _numberOfDoors);
+    }
+
+    /**
+     * @dev حذف تمامی خودروها از گاراژ تماس‌گیرنده
+     */
+    function resetMyGarage() external {
+        // حذف تمامی خودروها از گاراژ تماس‌گیرنده
+        delete garages[msg.sender];
+    }
+}

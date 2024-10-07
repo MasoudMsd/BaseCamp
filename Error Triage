@@ -1,0 +1,76 @@
+// SPDX-License-Identifier: MIT
+
+pragma solidity ^0.8.17;
+
+contract ErrorTriageExercise {
+    /**
+     * @dev پیدا کردن تفاوت بین هر عدد صحیح با همسایه‌اش (a تا b، b تا c و غیره)
+     * و بازگرداندن یک آرایه uint حاوی تفاوت مطلق عدد صحیح هر جفت.
+     *
+     * @param _a عدد صحیح بدون علامت اول.
+     * @param _b عدد صحیح بدون علامت دوم.
+     * @param _c عدد صحیح بدون علامت سوم.
+     * @param _d عدد صحیح بدون علامت چهارم.
+     *
+     * @return results آرایه‌ای حاوی تفاوت‌های مطلق بین هر جفت عدد صحیح.
+     */
+    function diffWithNeighbor(
+        uint _a,
+        uint _b,
+        uint _c,
+        uint _d
+    ) public pure returns (uint[] memory) {
+        // ایجاد یک آرایه برای ذخیره تفاوت‌ها
+        uint[] memory results = new uint[](3);
+
+        // محاسبه تفاوت مطلق بین هر جفت عدد صحیح و ذخیره آن در آرایه نتایج
+        results[0] = _a > _b ? _a - _b : _b - _a;
+        results[1] = _b > _c ? _b - _c : _c - _b;
+        results[2] = _c > _d ? _c - _d : _d - _c;
+
+        // بازگرداندن آرایه تفاوت‌ها
+        return results;
+    }
+
+    /**
+     * @dev تغییر پایه با مقدار اصلاح‌کننده. پایه همیشه بزرگتر یا مساوی 1000 است. اصلاح‌کننده‌ها می‌توانند بین مثبت و منفی 100 باشند.
+     *
+     * @param _base مقدار پایه مورد اصلاح.
+     * @param _modifier مقداری که پایه باید با آن اصلاح شود.
+     *
+     * @return returnValue مقدار اصلاح شده پایه.
+     */
+    function applyModifier(
+        uint _base,
+        int _modifier
+    ) public pure returns (uint returnValue) {
+        // اعمال اصلاح‌کننده به مقدار پایه
+        if (_modifier > 0) {
+            return _base + uint(_modifier);
+        }
+        return _base - uint(-_modifier);
+    }
+
+    uint[] arr;
+
+    function popWithReturn() public returns (uint returnNum) {
+        if (arr.length > 0) {
+            uint result = arr[arr.length - 1];
+            arr.pop();
+            return result;
+        }
+    }
+
+    // توابع کمکی زیر به درستی کار می‌کنند
+    function addToArr(uint _num) public {
+        arr.push(_num);
+    }
+
+    function getArr() public view returns (uint[] memory) {
+        return arr;
+    }
+
+    function resetArr() public {
+        delete arr;
+    }
+}

@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract EmployeeStorage {
+    // متغیرهای حالت خصوصی برای ذخیره اطلاعات کارمند
+    uint16 private shares; // تعداد سهام متعلق به کارمند (خصوصی)
+    uint32 private salary; // حقوق ماهیانه کارمند (خصوصی)
+    uint256 public idNumber; // شماره شناسایی منحصر به فرد کارمند (دسترسی عمومی)
+    string public name; // نام کارمند (دسترسی عمومی)
+
+    // سازنده برای مقداردهی اولیه داده‌های کارمند در زمان استقرار قرارداد
+    constructor(uint16 _shares, string memory _name, uint32 _salary, uint _idNumber) {
+        shares = _shares; // مقداردهی اولیه سهام
+        name = _name; // مقداردهی اولیه نام
+        salary = _salary; // مقداردهی اولیه حقوق
+        idNumber = _idNumber; // مقداردهی اولیه شماره شناسایی
+    }
+
+    // تابع مشاهده برای دریافت تعداد سهام متعلق به کارمند
+    function viewShares() public view returns (uint16) {
+        return shares;
+    }
+    
+    // تابع مشاهده برای دریافت حقوق ماهیانه کارمند
+    function viewSalary() public view returns (uint32) {
+        return salary;
+    }
+
+    // تعریف خطای سفارشی
+    error TooManyShares(uint16 totalShares);
+    
+    // تابعی برای اختصاص سهام اضافی به کارمند
+    function grantShares(uint16 _newShares) public {
+        // بررسی اینکه آیا تعداد سهام جدید از حد مجاز فراتر می‌رود
+        if (_newShares > 5000) {
+            revert("Too many shares"); // بازگرداندن خطا با پیام مشخص
+        } else if (shares + _newShares > 5000) {
+            revert TooManyShares(shares + _newShares); // بازگرداندن خطای سفارشی با مقدار سهام جدید
+        }
+        shares += _newShares; // افزودن سهام جدید به مجموع
+    }
+
+    // تابعی برای بررسی چیدمان متغیرهای ذخیره شده (برای تست استفاده می‌شود)
+    function checkForPacking(uint _slot) public view returns (uint r) {
+        assembly {
+            r := sload(_slot)
+        }
+    }
+
+    // تابعی برای ریست کردن سهام به منظور دیباگ (برای تست استفاده می‌شود)
+    function debugResetShares() public {
+        shares = 1000; // بازنشانی سهام به 1000
+    }
+}
